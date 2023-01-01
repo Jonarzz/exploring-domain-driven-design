@@ -1,5 +1,8 @@
 package io.github.jonarzz.ddd.tictactoe.model;
 
+import lombok.*;
+
+@ToString
 class MoveValid implements MoveResult {
 
     @Override

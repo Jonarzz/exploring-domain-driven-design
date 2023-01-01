@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.util.*;
 
+@ToString
 @RequiredArgsConstructor
 class MoveInvalid implements MoveResult {
 

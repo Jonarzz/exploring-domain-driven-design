@@ -83,7 +83,7 @@ class GameTest {
 
         assertThat(results)
                 .as("All move results should be valid")
-                .allSatisfy(MoveResult::valid);
+                .allMatch(MoveResult::valid);
         assertThat(game.over())
                 .as("Game over")
                 .isTrue();
@@ -132,7 +132,17 @@ class GameTest {
                         // x | x |
                         // x | o | x
                         // o | o | o
-                        UPPER_CENTER, LOWER_LEFT, UPPER_LEFT, LOWER_LEFT
+                        UPPER_CENTER, LOWER_LEFT, UPPER_LEFT, LOWER_RIGHT
+                ),
+                List.of(
+                        //   | x |
+                        //   | o | o
+                        //   | x |
+                        UPPER_CENTER, CENTER_RIGHT, LOWER_CENTER, CENTER,
+                        //   | x | o
+                        // x | o | o
+                        // x | x | o
+                        CENTER_LEFT, UPPER_RIGHT, LOWER_LEFT, LOWER_RIGHT
                 )
         );
     }
@@ -149,7 +159,7 @@ class GameTest {
 
         assertThat(results)
                 .as("All move results should be valid")
-                .allSatisfy(MoveResult::valid);
+                .allMatch(MoveResult::valid);
         assertThat(game.over())
                 .as("Game over")
                 .isTrue();
@@ -164,11 +174,11 @@ class GameTest {
                         // o |   |
                         // x | o |
                         // x |   |
-                        UPPER_LEFT, LOWER_RIGHT, UPPER_CENTER, UPPER_RIGHT,
-                        // o | x |
-                        // x | o |
+                        LOWER_LEFT, CENTER, CENTER_LEFT, UPPER_LEFT,
+                        // o | x | x
+                        // x | o | o
                         // x | o | x
-                        CENTER_RIGHT, LOWER_LEFT, LOWER_CENTER, CENTER
+                        LOWER_RIGHT, LOWER_CENTER, UPPER_CENTER, CENTER_RIGHT, UPPER_RIGHT
                 ),
                 List.of(
                         //   |   | o
@@ -177,8 +187,8 @@ class GameTest {
                         CENTER, UPPER_RIGHT, CENTER_LEFT, CENTER_RIGHT,
                         // o | x | o
                         // x | x | o
-                        //   | o | x
-                        LOWER_RIGHT, UPPER_LEFT, UPPER_CENTER, LOWER_CENTER
+                        // o | o | x
+                        LOWER_RIGHT, UPPER_LEFT, UPPER_CENTER, LOWER_CENTER, LOWER_LEFT
                 )
         );
     }
