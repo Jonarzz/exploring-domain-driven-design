@@ -2,11 +2,14 @@ package io.github.jonarzz.ddd.tictactoe;
 
 import static io.github.jonarzz.ddd.tictactoe.model.grid.Position.BasicDirection.*;
 
+import lombok.extern.java.*;
+
 import java.util.*;
 
 import io.github.jonarzz.ddd.tictactoe.model.game.*;
 import io.github.jonarzz.ddd.tictactoe.model.grid.*;
 
+@Log
 public class Main {
 
     private static final Map<String, Position.BasicDirection> DIRECTION_INPUT_MAPPING = Map.of(
@@ -37,10 +40,10 @@ public class Main {
 
     private static Game setUpTheGame(Scanner scanner) {
         var firstMark = 'o';
-        System.out.println("Enter first player name (" + firstMark + ")");
+        log.info("Enter first player name (" + firstMark + ")");
         var firstPlayerName = scanner.nextLine();
         var secondMark = 'x';
-        System.out.println("Enter second player name (" + secondMark + ")");
+        log.info("Enter second player name (" + secondMark + ")");
         var secondPlayerName = scanner.nextLine();
         return Game.withDefaultGridSize()
                    .addPlayer(firstPlayerName, firstMark)
@@ -53,24 +56,24 @@ public class Main {
         do {
             Optional<Position> position;
             do {
-                System.out.println(game.currentPlayerName() + ", enter position\n" + POSITIONS_DESCRIPTION);
+                log.info(game.currentPlayerName() + ", enter position\n" + POSITIONS_DESCRIPTION);
                 var positionInput = scanner.nextLine();
                 position = positionFromInput(positionInput);
             } while (position.isEmpty());
             result = game.placeMarkOn(position.get());
             if (result.valid()) {
-                System.out.println(game.view());
+                log.info(game.view());
             } else {
-                System.err.println(result.message());
+                log.warning(result.message());
             }
         } while (!result.valid() || !result.endsTheGame());
-        System.out.println("Game over - " + result.message());
+        log.info("Game over - " + result.message());
     }
 
     private static Optional<Position> positionFromInput(String input) {
         var direction = DIRECTION_INPUT_MAPPING.get(input.toUpperCase());
         if (direction == null) {
-            System.err.println("Invalid position, see below:\n" + POSITIONS_DESCRIPTION);
+            log.warning("Invalid position, see below:\n" + POSITIONS_DESCRIPTION);
             return Optional.empty();
         }
         return Optional.of(Position.from(direction));

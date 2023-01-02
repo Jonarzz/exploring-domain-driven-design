@@ -14,8 +14,10 @@ class WinningDiagonalSpecification implements WinningVectorSpecification {
         var firstAntidiagonal = gridMarks[gridSize - 1][0];
         var antidiagonalAllMatch = firstAntidiagonal != null;
         for (int i = 1; i < gridSize; i++) {
-            diagonalAllMatch &= marksEqual(firstDiagonal, gridMarks[i][i]);
-            antidiagonalAllMatch &= marksEqual(firstAntidiagonal, gridMarks[gridSize - 1 - i][i]);
+            diagonalAllMatch = diagonalAllMatch
+                               && firstDiagonal.equals(gridMarks[i][i]);
+            antidiagonalAllMatch = antidiagonalAllMatch
+                                   && firstAntidiagonal.equals(gridMarks[gridSize - 1 - i][i]);
         }
         if (diagonalAllMatch) {
             return Optional.of(new Diagonal(MAIN));
@@ -24,12 +26,5 @@ class WinningDiagonalSpecification implements WinningVectorSpecification {
             return Optional.of(new Diagonal(ANTIDIAGONAL));
         }
         return Optional.empty();
-    }
-
-    private static boolean marksEqual(Mark first, Mark second) {
-        if (first == null) {
-            return false;
-        }
-        return first.equals(second);
     }
 }

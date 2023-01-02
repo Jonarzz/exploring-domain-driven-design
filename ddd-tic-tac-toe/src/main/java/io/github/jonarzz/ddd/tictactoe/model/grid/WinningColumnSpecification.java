@@ -9,11 +9,11 @@ class WinningColumnSpecification implements WinningVectorSpecification {
     @Override
     public Optional<GridVector> calculate(Mark[][] gridMarks) {
         var gridSize = gridMarks.length;
-        for (int col = 0; col < gridSize; col++) {
-            var first = gridMarks[0][col];
+        for (int column = 0; column < gridSize; column++) {
+            var first = gridMarks[0][column];
             if (first != null) {
-                var column = col;
-                if (stream(gridMarks).map(marksRow -> marksRow[column])
+                var col = column;
+                if (stream(gridMarks).map(marksRow -> marksRow[col])
                                      .allMatch(first::equals)) {
                     return Optional.of(new Column(column));
                 }

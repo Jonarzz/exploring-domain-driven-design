@@ -12,10 +12,8 @@ class WinningRowSpecification implements WinningVectorSpecification {
         for (int row = 0; row < gridSize; row++) {
             var rowMarks = gridMarks[row];
             var first = rowMarks[0];
-            if (first != null) {
-                if (stream(rowMarks).allMatch(first::equals)) {
-                    return Optional.of(new Row(row));
-                }
+            if (first != null && stream(rowMarks).allMatch(first::equals)) {
+                return Optional.of(new Row(row));
             }
         }
         return Optional.empty();
