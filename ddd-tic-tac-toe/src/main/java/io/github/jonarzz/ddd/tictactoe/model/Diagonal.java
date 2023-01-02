@@ -1,5 +1,8 @@
 package io.github.jonarzz.ddd.tictactoe.model;
 
+import org.jqassistant.contrib.plugin.ddd.annotation.DDD.*;
+
+@ValueObject
 record Diagonal(Type type) implements GridVector {
 
     enum Type {

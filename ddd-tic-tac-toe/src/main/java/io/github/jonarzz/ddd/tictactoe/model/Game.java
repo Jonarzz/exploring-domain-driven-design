@@ -1,7 +1,10 @@
 package io.github.jonarzz.ddd.tictactoe.model;
 
+import org.jqassistant.contrib.plugin.ddd.annotation.DDD.*;
+
 import java.util.*;
 
+@AggregateRoot
 public class Game {
 
     final Grid grid;

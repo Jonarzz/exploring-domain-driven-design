@@ -3,7 +3,9 @@ package io.github.jonarzz.ddd.tictactoe.model;
 import static lombok.AccessLevel.*;
 
 import lombok.*;
+import org.jqassistant.contrib.plugin.ddd.annotation.DDD.*;
 
+@Factory
 public class PositionFactory {
 
     @AllArgsConstructor(access = PRIVATE)
