@@ -1,4 +1,4 @@
-package io.github.jonarzz.ddd.tictactoe.model;
+package io.github.jonarzz.ddd.tictactoe.model.grid;
 
 import org.jqassistant.contrib.plugin.ddd.annotation.DDD.*;
 
@@ -7,6 +7,6 @@ record Column(int index) implements GridVector {
 
     @Override
     public String humanReadable() {
-        return "column " + index;
+        return "column " + (index + 1);
     }
 }

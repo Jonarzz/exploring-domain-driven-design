@@ -1,7 +1,8 @@
 package io.github.jonarzz.ddd.tictactoe;
 
-import static io.github.jonarzz.ddd.tictactoe.model.PositionFactory.BasicSquarePosition.*;
+import static io.github.jonarzz.ddd.tictactoe.model.grid.Position.BasicDirection.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
@@ -9,91 +10,95 @@ import org.junit.jupiter.params.provider.*;
 import java.util.*;
 import java.util.stream.*;
 
-import io.github.jonarzz.ddd.tictactoe.model.*;
-import io.github.jonarzz.ddd.tictactoe.model.PositionFactory.*;
+import io.github.jonarzz.ddd.tictactoe.model.game.*;
+import io.github.jonarzz.ddd.tictactoe.model.grid.*;
 
 class GameTest {
 
     @ParameterizedTest(name = "{0}")
-    @EnumSource(BasicSquarePosition.class)
-    void firstMove(BasicSquarePosition squarePosition) {
+    @EnumSource(Position.BasicDirection.class)
+    void firstMove(Position.BasicDirection direction) {
         var game = createSimpleGame();
-        var position = new PositionFactory()
-                .basic(squarePosition);
+        var position = Position.from(direction);
 
         var moveResult = game.placeMarkOn(position);
 
-        assertThat(moveResult.valid())
-                .as("%s is valid", moveResult)
-                .isTrue();
-        assertThat(game.over())
-                .as("Game over")
-                .isFalse();
-        assertThat(game.tied())
-                .as("Game tied")
-                .isTrue();
+        assertSoftly(softly -> {
+            softly.assertThat(moveResult.valid())
+                  .as("%s is valid", moveResult)
+                  .isTrue();
+            softly.assertThat(moveResult.endsTheGame())
+                  .as("%s ends the game", moveResult)
+                  .isFalse();
+        });
     }
 
     @ParameterizedTest(name = "{0}")
-    @EnumSource(BasicSquarePosition.class)
-    void twoMarksOnTheSamePosition(BasicSquarePosition squarePosition) {
+    @EnumSource(Position.BasicDirection.class)
+    void twoMarksOnTheSamePosition(Position.BasicDirection direction) {
         var game = createSimpleGame();
-        var position = new PositionFactory()
-                .basic(squarePosition);
+        var position = Position.from(direction);
         game.placeMarkOn(position);
 
         var secondMoveResult = game.placeMarkOn(position);
 
-        assertThat(secondMoveResult)
-                .returns(false, MoveResult::valid)
-                .extracting(MoveResult::message, OPTIONAL)
-                .hasValue("Square filled in already");
-        assertThat(game.over())
-                .as("Game over")
-                .isFalse();
+        assertSoftly(softly -> {
+            softly.assertThat(secondMoveResult.valid())
+                  .as("%s is valid", secondMoveResult)
+                  .isFalse();
+            softly.assertThat(secondMoveResult.message())
+                  .as("%s message", secondMoveResult)
+                  .isEqualTo("Square filled in already");
+            softly.assertThat(secondMoveResult.endsTheGame())
+                  .as("%s ends the game", secondMoveResult)
+                  .isFalse();
+        });
     }
 
     @ParameterizedTest(name = "position = {0}, {1}")
     @CsvSource({"-1, 0", "0, -1", "-1, -1", "3, 0", "0, 3", "3, 3"})
     void markOutsideOfGridBounds(int row, int column) {
         var game = createSimpleGame();
-        var position = new PositionFactory()
-                .withCoordinates(row, column);
+        var position = new Position(row, column);
         game.placeMarkOn(position);
 
         var secondMoveResult = game.placeMarkOn(position);
 
-        assertThat(secondMoveResult)
-                .returns(false, MoveResult::valid)
-                .extracting(MoveResult::message, OPTIONAL)
-                .hasValue("Square out of grid bounds");
-        assertThat(game.over())
-                .as("Game over")
-                .isFalse();
+        assertSoftly(softly -> {
+            softly.assertThat(secondMoveResult.valid())
+                  .as("%s is valid", secondMoveResult)
+                  .isFalse();
+            softly.assertThat(secondMoveResult.message())
+                  .as("%s message", secondMoveResult)
+                  .isEqualTo("Square out of grid bounds");
+            softly.assertThat(secondMoveResult.endsTheGame())
+                  .as("%s ends the game", secondMoveResult)
+                  .isFalse();
+        });
     }
 
     @ParameterizedTest(name = "moves = {0}")
     @MethodSource("fullWonGameParams")
-    void fullGameEndingWithWin(List<BasicSquarePosition> moves) {
+    void fullGameEndingWithWin(List<Position.BasicDirection> moves) {
         var game = createSimpleGame();
-        var positionFactory = new PositionFactory();
 
         var results = moves.stream()
-                           .map(move -> game.placeMarkOn(positionFactory.basic(move)))
+                           .map(Position::from)
+                           .map(game::placeMarkOn)
                            .toList();
 
         assertThat(results)
                 .as("All move results should be valid")
-                .allMatch(MoveResult::valid);
-        assertThat(game.over())
-                .as("Game over")
-                .isTrue();
+                .allMatch(MoveResult::valid)
+                .last()
+                .as("Last move ends the game")
+                .returns(true, MoveResult::endsTheGame);
         assertThat(game.tied())
                 .as("Game tied")
                 .isFalse();
     }
 
-    static Stream<List<BasicSquarePosition>> fullWonGameParams() {
+    static Stream<List<Position.BasicDirection>> fullWonGameParams() {
         return Stream.of(
                 List.of(
                         // x | x | o
@@ -150,26 +155,26 @@ class GameTest {
 
     @ParameterizedTest(name = "moves = {0}")
     @MethodSource("fullTiedGameParams")
-    void fullGameEndingWithTie(List<BasicSquarePosition> moves) {
+    void fullGameEndingWithTie(List<Position.BasicDirection> moves) {
         var game = createSimpleGame();
-        var positionFactory = new PositionFactory();
 
         var results = moves.stream()
-                           .map(move -> game.placeMarkOn(positionFactory.basic(move)))
+                           .map(Position::from)
+                           .map(game::placeMarkOn)
                            .toList();
 
         assertThat(results)
                 .as("All move results should be valid")
-                .allMatch(MoveResult::valid);
-        assertThat(game.over())
-                .as("Game over")
-                .isTrue();
+                .allMatch(MoveResult::valid)
+                .last()
+                .as("Last move ends the game")
+                .returns(true, MoveResult::endsTheGame);
         assertThat(game.tied())
                 .as("Game tied")
                 .isTrue();
     }
 
-    static Stream<List<BasicSquarePosition>> fullTiedGameParams() {
+    static Stream<List<Position.BasicDirection>> fullTiedGameParams() {
         return Stream.of(
                 List.of(
                         // o |   |

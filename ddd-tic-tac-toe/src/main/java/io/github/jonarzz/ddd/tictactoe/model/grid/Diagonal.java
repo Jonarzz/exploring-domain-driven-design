@@ -1,4 +1,4 @@
-package io.github.jonarzz.ddd.tictactoe.model;
+package io.github.jonarzz.ddd.tictactoe.model.grid;
 
 import org.jqassistant.contrib.plugin.ddd.annotation.DDD.*;
 

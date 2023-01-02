@@ -1,11 +1,13 @@
-package io.github.jonarzz.ddd.tictactoe.model;
+package io.github.jonarzz.ddd.tictactoe.infrastructure.result;
 
 import lombok.*;
+import lombok.experimental.*;
 
-class Validated<T> {
+@FieldDefaults(makeFinal = true)
+public class Validated<T> {
 
     @Getter
-    final boolean valid;
+    boolean valid;
     @Getter
     String invalidityReason;
     T object;
@@ -13,22 +15,24 @@ class Validated<T> {
     private Validated(String invalidityReason) {
         valid = false;
         this.invalidityReason = invalidityReason;
+        object = null;
     }
 
     private Validated(T object) {
         valid = true;
+        invalidityReason = null;
         this.object = object;
     }
 
-    static <T> Validated<T> invalid(String reason) {
+    public static <T> Validated<T> invalid(String reason) {
         return new Validated<>(reason);
     }
 
-    static <T> Validated<T> valid(T object) {
+    public static <T> Validated<T> valid(T object) {
         return new Validated<>(object);
     }
 
-    T getValidObject() {
+    public T getValidObject() {
         if (!valid()) {
             throw new IllegalStateException("Object not valid, reason: " + invalidityReason);
         }
