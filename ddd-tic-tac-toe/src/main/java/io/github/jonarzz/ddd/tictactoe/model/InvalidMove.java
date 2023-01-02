@@ -2,11 +2,9 @@ package io.github.jonarzz.ddd.tictactoe.model;
 
 import lombok.*;
 
-import java.util.*;
-
 @ToString
 @RequiredArgsConstructor
-class MoveInvalid implements MoveResult {
+class InvalidMove implements MoveResult {
 
     @NonNull
     String reason;
@@ -17,7 +15,7 @@ class MoveInvalid implements MoveResult {
     }
 
     @Override
-    public Optional<String> message() {
-        return Optional.of(reason);
+    public String message() {
+        return reason;
     }
 }

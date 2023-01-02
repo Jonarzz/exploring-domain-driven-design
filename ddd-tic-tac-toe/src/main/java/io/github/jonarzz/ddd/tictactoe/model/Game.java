@@ -4,12 +4,10 @@ import java.util.*;
 
 public class Game {
 
-    final int gridSize;
-    final List<Player> players;
+    final Grid grid;
 
-    final Boolean[][] grid;
-    boolean currentPlayer;
-    int numberOfSquaresFilled;
+    final List<Player> players;
+    int currentPlayerIndex;
 
     boolean over;
     boolean tied = true;
@@ -24,9 +22,9 @@ public class Game {
             throw new IllegalStateException("At least " + minNumberOfPlayers
                                             + " players are required to play the game");
         }
-        this.gridSize = gridSize;
+        grid = new Grid(gridSize);
         this.players = List.copyOf(players);
-        grid = new Boolean[gridSize][gridSize];
+        currentPlayerIndex = 0;
     }
 
     public static Builder withDefaultGridSize() {
@@ -38,34 +36,24 @@ public class Game {
     }
 
     public MoveResult placeMarkOn(Position position) {
-        if (isOutOfBounds(position)) {
-            return new MoveInvalid("Square out of grid bounds");
+        var currentPlayer = players.get(currentPlayerIndex);
+        var mark = currentPlayer.mark();
+        var validatedSquare = grid.place(position, mark);
+        if (!validatedSquare.valid()) {
+            return new InvalidMove(validatedSquare.invalidityReason());
         }
-        var row = position.row();
-        var column = position.column();
-        if (grid[row][column] != null) {
-            return new MoveInvalid("Square filled in already");
-        }
-        grid[row][column] = currentPlayer;
-        ++numberOfSquaresFilled;
-        var fullRow = true;
-        var fullColumn = true;
-        var fullDiagonal = true;
-        var fullOtherDiagonal = true;
-        for (int i = 0; i < gridSize; i++) {
-            fullRow &= Objects.equals(currentPlayer, grid[row][i]);
-            fullColumn &= Objects.equals(currentPlayer, grid[i][column]);
-            fullDiagonal &= Objects.equals(currentPlayer, grid[i][i]);
-            fullOtherDiagonal &= Objects.equals(currentPlayer, grid[gridSize - 1 - i][i]);
-        }
-        if (fullRow || fullColumn || fullDiagonal || fullOtherDiagonal) {
+        var winningVector = grid.getWinningVector();
+        if (winningVector.isPresent()) {
             over = true;
             tied = false;
-        } else if (numberOfSquaresFilled == gridSize * gridSize) {
-            over = true;
+            return new WinningMove(winningVector.get());
         }
-        currentPlayer = !currentPlayer;
-        return new MoveValid();
+        if (grid.isFull()) {
+            over = true;
+            return new TyingMove();
+        }
+        setNextPlayerIndex();
+        return new ValidMove();
     }
 
     public boolean over() {
@@ -76,11 +64,21 @@ public class Game {
         return tied;
     }
 
-    private boolean isOutOfBounds(Position position) {
-        var row = position.row();
-        var column = position.column();
-        return row < 0|| row >= gridSize
-               || column < 0 || column >= gridSize;
+    public String currentPlayerName() {
+        return players.get(currentPlayerIndex)
+                      .name();
+    }
+
+    public String view() {
+        return grid.toString();
+    }
+
+    private void setNextPlayerIndex() {
+        if (currentPlayerIndex == players.size() - 1) {
+            currentPlayerIndex = 0;
+        } else {
+            ++currentPlayerIndex;
+        }
     }
 
     public static class Builder {
@@ -92,8 +90,8 @@ public class Game {
             this.gridSize = gridSize;
         }
 
-        public Builder addPlayer() {
-            players.add(new Player());
+        public Builder addPlayer(String name, char mark) {
+            players.add(new Player(name, new Mark(mark)));
             return this;
         }
 

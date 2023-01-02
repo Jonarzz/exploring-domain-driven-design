@@ -12,8 +12,8 @@ public class PositionFactory {
         CENTER_LEFT(1, 0), CENTER(1, 1),       CENTER_RIGHT(1, 2),
         LOWER_LEFT(2, 0),  LOWER_CENTER(2, 1), LOWER_RIGHT(2, 2);
 
-        int row;
-        int column;
+        final int row;
+        final int column;
     }
 
     public Position basic(BasicSquarePosition squarePosition) {

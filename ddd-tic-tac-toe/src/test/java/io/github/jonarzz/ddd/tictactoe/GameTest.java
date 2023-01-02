@@ -23,8 +23,9 @@ class GameTest {
 
         var moveResult = game.placeMarkOn(position);
 
-        assertThat(moveResult)
-                .returns(true, MoveResult::valid);
+        assertThat(moveResult.valid())
+                .as("%s is valid", moveResult)
+                .isTrue();
         assertThat(game.over())
                 .as("Game over")
                 .isFalse();
@@ -195,8 +196,8 @@ class GameTest {
 
     static Game createSimpleGame() {
         return Game.withDefaultGridSize()
-                   .addPlayer()
-                   .addPlayer()
+                   .addPlayer("First", 'x')
+                   .addPlayer("Second", 'o')
                    .build();
     }
 }
