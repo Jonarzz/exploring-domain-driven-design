@@ -34,7 +34,7 @@ public class Game {
         var mark = players.get(currentPlayerIndex)
                           .mark();
         var validatedSquare = grid.place(position, mark);
-        if (!validatedSquare.valid()) {
+        if (validatedSquare.isNotValid()) {
             return new InvalidMove(validatedSquare.invalidityReason());
         }
         var winningVector = grid.getWinningVector();

@@ -2,15 +2,18 @@ package io.github.jonarzz.ddd.tictactoe;
 
 import static io.github.jonarzz.ddd.tictactoe.model.grid.Position.BasicDirection.*;
 
-import lombok.extern.java.*;
+import lombok.*;
 
+import java.io.*;
 import java.util.*;
 
 import io.github.jonarzz.ddd.tictactoe.model.game.*;
 import io.github.jonarzz.ddd.tictactoe.model.grid.*;
 
-@Log
+@CustomLog
 public class Main {
+
+    static InputStream inputStream = System.in;
 
     private static final Map<String, Position.BasicDirection> DIRECTION_INPUT_MAPPING = Map.of(
             "UL", UPPER_LEFT,
@@ -32,7 +35,7 @@ public class Main {
             """;
 
     public static void main(String[] args) {
-        try (var scanner = new Scanner(System.in)) {
+        try (var scanner = new Scanner(inputStream)) {
             var theGame = setUpTheGame(scanner);
             play(theGame, scanner);
         }
@@ -64,7 +67,7 @@ public class Main {
             if (result.valid()) {
                 log.info(game.view());
             } else {
-                log.warning(result.message());
+                log.error(result.message());
             }
         } while (!result.valid() || !result.endsTheGame());
         log.info("Game over - " + result.message());
@@ -73,7 +76,7 @@ public class Main {
     private static Optional<Position> positionFromInput(String input) {
         var direction = DIRECTION_INPUT_MAPPING.get(input.toUpperCase());
         if (direction == null) {
-            log.warning("Invalid position, see below:\n" + POSITIONS_DESCRIPTION);
+            log.error("Invalid position, see below:\n" + POSITIONS_DESCRIPTION);
             return Optional.empty();
         }
         return Optional.of(Position.from(direction));

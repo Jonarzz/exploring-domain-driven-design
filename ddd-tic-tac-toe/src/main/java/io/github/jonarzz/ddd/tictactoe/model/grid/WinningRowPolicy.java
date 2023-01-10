@@ -4,7 +4,7 @@ import static java.util.Arrays.*;
 
 import java.util.*;
 
-class WinningRowSpecification implements WinningVectorSpecification {
+class WinningRowPolicy implements WinningVectorPolicy {
 
     @Override
     public Optional<GridVector> calculate(Mark[][] gridMarks) {

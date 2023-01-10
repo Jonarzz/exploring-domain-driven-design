@@ -28,7 +28,7 @@ public class Grid {
             return Validated.invalid("Square filled in already");
         }
         add(position, new Mark(mark));
-        return Validated.valid(null);
+        return Validated.valid();
     }
 
     public boolean isFull() {
@@ -37,9 +37,10 @@ public class Grid {
     }
 
     public Optional<GridVector> getWinningVector() {
-        return Stream.of(new WinningRowSpecification(),
-                         new WinningColumnSpecification(),
-                         new WinningDiagonalSpecification())
+        return Stream.of(new WinningRowPolicy(),
+                         new WinningColumnPolicy(),
+                         new WinningMainDiagonalPolicy(),
+                         new WinningAntidiagonalPolicy())
                      .map(spec -> spec.calculate(gridMarks))
                      .flatMap(Optional::stream)
                      .findFirst();
